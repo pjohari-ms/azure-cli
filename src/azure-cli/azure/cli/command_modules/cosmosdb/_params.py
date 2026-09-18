@@ -97,6 +97,13 @@ FLEETSPACE_ACCOUNT_PROPERTIES_EXAMPLE = """--body "{
 """
 
 
+SQL_THROUGHPUT_BUCKETS_EXAMPLE = """--throughput-buckets "[
+    { \"id\": 1, \"maxThroughputPercentage\": 10 },
+    { \"id\": 2, \"maxThroughputPercentage\": 20, \"isDefaultBucket\": true }
+]"
+"""
+
+
 class ThroughputTypes(str, Enum):
     autoscale = "autoscale"
     manual = "manual"
@@ -359,6 +366,7 @@ def load_arguments(self, _):
         c.argument('container_name', options_list=['--name', '-n'], help="Container name")
         c.argument('throughput', type=int, help='The throughput of SQL container (RU/s).')
         c.argument('max_throughput', max_throughput_type)
+        c.argument('throughput_buckets', options_list=['--throughput-buckets'], type=shell_safe_json_parse, completer=FilesCompleter(), help='Throughput buckets, you can enter them as a string or as a file, e.g., --throughput-buckets @throughput-buckets-file.json or ' + SQL_THROUGHPUT_BUCKETS_EXAMPLE)
 
     with self.argument_context('cosmosdb mongodb database throughput') as c:
         c.argument('account_name', account_name_type, id_part=None)
