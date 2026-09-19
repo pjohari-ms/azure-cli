@@ -49,6 +49,7 @@ from azure.mgmt.cosmosdb.models import (
     GremlinGraphCreateUpdateParameters,
     ThroughputSettingsResource,
     ThroughputSettingsUpdateParameters,
+    ThroughputBucketResource,
     AutoscaleSettings,
     PeriodicModeBackupPolicy,
     PeriodicModeProperties,
@@ -1404,9 +1405,19 @@ def cli_cosmosdb_sql_container_throughput_update(client,
                                                  database_name,
                                                  container_name,
                                                  throughput=None,
-                                                 max_throughput=None):
+                                                 max_throughput=None,
+                                                 throughput_buckets=None):
     """Update an Azure Cosmos DB SQL container throughput"""
-    throughput_update_resource = _get_throughput_settings_update_parameters(throughput, max_throughput)
+    if throughput_buckets is None:
+        current_throughput = client.get_sql_container_throughput(resource_group_name,
+                                                                 account_name,
+                                                                 database_name,
+                                                                 container_name)
+        if current_throughput.resource and current_throughput.resource.throughput_buckets is not None:
+            throughput_buckets = current_throughput.resource.throughput_buckets
+
+    throughput_update_resource = _get_throughput_settings_update_parameters(
+        throughput, max_throughput, throughput_buckets)
     return client.begin_update_sql_container_throughput(resource_group_name,
                                                         account_name,
                                                         database_name,
@@ -1617,14 +1628,26 @@ def cli_cosmosdb_table_throughput_migrate(client,
     return client.begin_migrate_table_to_manual_throughput(resource_group_name, account_name, table_name)
 
 
-def _get_throughput_settings_update_parameters(throughput=None, max_throughput=None):
+def _get_throughput_settings_update_parameters(throughput=None, max_throughput=None, throughput_buckets=None):
     throughput_resource = None
     if throughput and max_throughput:
         raise CLIError("Please provide max-throughput if your resource is autoscale enabled otherwise provide throughput.")
+    if throughput_buckets is not None:
+        throughput_buckets = [
+            bucket if isinstance(bucket, ThroughputBucketResource) else ThroughputBucketResource(
+                id=bucket.get('id'),
+                max_throughput_percentage=bucket.get('maxThroughputPercentage'),
+                is_default_bucket=bucket.get('isDefaultBucket'))
+            for bucket in throughput_buckets
+        ]
     if throughput:
-        throughput_resource = ThroughputSettingsResource(throughput=throughput)
+        throughput_resource = ThroughputSettingsResource(
+            throughput=throughput,
+            throughput_buckets=throughput_buckets)
     elif max_throughput:
-        throughput_resource = ThroughputSettingsResource(autoscale_settings=AutoscaleSettings(max_throughput=max_throughput))
+        throughput_resource = ThroughputSettingsResource(
+            autoscale_settings=AutoscaleSettings(max_throughput=max_throughput),
+            throughput_buckets=throughput_buckets)
 
     return ThroughputSettingsUpdateParameters(resource=throughput_resource)
 
