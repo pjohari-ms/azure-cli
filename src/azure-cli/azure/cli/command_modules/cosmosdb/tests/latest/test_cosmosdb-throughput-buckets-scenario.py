@@ -3,7 +3,42 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
+import unittest
+
 from azure.cli.testsdk import ScenarioTest, ResourceGroupPreparer
+
+
+class TestCosmosdbThroughputBucketsModel(unittest.TestCase):
+
+    def test_throughput_bucket_inputs_use_generated_sdk_models(self):
+        from azure.cli.command_modules.cosmosdb.custom import _get_throughput_settings_update_parameters
+        from azure.mgmt.cosmosdb.models import (
+            ThroughputBucketResource,
+            ThroughputSettingsResource,
+            ThroughputSettingsUpdateParameters,
+        )
+
+        bucket_input = {
+            'id': 1,
+            'maxThroughputPercentage': 10,
+            'isDefaultBucket': True,
+        }
+
+        for request in [
+                _get_throughput_settings_update_parameters(throughput=400, throughput_buckets=[bucket_input]),
+                _get_throughput_settings_update_parameters(max_throughput=1000, throughput_buckets=[bucket_input])]:
+            self.assertIsInstance(request, ThroughputSettingsUpdateParameters)
+            self.assertIsInstance(request.resource, ThroughputSettingsResource)
+            self.assertIsInstance(request.resource.throughput_buckets[0], ThroughputBucketResource)
+            self.assertEqual(request.resource.throughput_buckets[0].id, 1)
+            self.assertEqual(request.resource.throughput_buckets[0].max_throughput_percentage, 10)
+            self.assertTrue(request.resource.throughput_buckets[0].is_default_bucket)
+            self.assertEqual(request.as_dict()['properties']['resource']['throughputBuckets'], [bucket_input])
+
+        existing_bucket = ThroughputBucketResource(id=2, max_throughput_percentage=20)
+        request = _get_throughput_settings_update_parameters(
+            throughput=400, throughput_buckets=[existing_bucket])
+        self.assertIs(request.resource.throughput_buckets[0], existing_bucket)
 
 
 class CosmosdbThroughputBucketsScenarioTest(ScenarioTest):

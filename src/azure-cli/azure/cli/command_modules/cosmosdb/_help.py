@@ -845,7 +845,8 @@ type: command
 short-summary: Update the throughput of the SQL container under an Azure Cosmos DB SQL database.
 examples:
   - name: Configure throughput buckets for a SQL container.
-    text: az cosmosdb sql container throughput update -g mygroup -a myaccount -d mydatabase -n mycontainer --throughput 400 --throughput-buckets '[{"id": 1, "maxThroughputPercentage": 10}, {"id": 2, "maxThroughputPercentage": 20, "isDefaultBucket": true}]'
+    text: >-
+      az cosmosdb sql container throughput update -g mygroup -a myaccount -d mydatabase -n mycontainer --throughput 400 --throughput-buckets '[{"id": 1, "maxThroughputPercentage": 10}, {"id": 2, "maxThroughputPercentage": 20, "isDefaultBucket": true}]'
   - name: Update container throughput while preserving configured throughput buckets.
     text: az cosmosdb sql container throughput update -g mygroup -a myaccount -d mydatabase -n mycontainer --throughput 800
 """

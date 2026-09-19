@@ -49,6 +49,7 @@ from azure.mgmt.cosmosdb.models import (
     GremlinGraphCreateUpdateParameters,
     ThroughputSettingsResource,
     ThroughputSettingsUpdateParameters,
+    ThroughputBucketResource,
     AutoscaleSettings,
     PeriodicModeBackupPolicy,
     PeriodicModeProperties,
@@ -1631,6 +1632,14 @@ def _get_throughput_settings_update_parameters(throughput=None, max_throughput=N
     throughput_resource = None
     if throughput and max_throughput:
         raise CLIError("Please provide max-throughput if your resource is autoscale enabled otherwise provide throughput.")
+    if throughput_buckets is not None:
+        throughput_buckets = [
+            bucket if isinstance(bucket, ThroughputBucketResource) else ThroughputBucketResource(
+                id=bucket.get('id'),
+                max_throughput_percentage=bucket.get('maxThroughputPercentage'),
+                is_default_bucket=bucket.get('isDefaultBucket'))
+            for bucket in throughput_buckets
+        ]
     if throughput:
         throughput_resource = ThroughputSettingsResource(
             throughput=throughput,
