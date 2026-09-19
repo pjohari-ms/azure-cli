@@ -180,7 +180,7 @@ parameters:
     short-summary: Add table names to restore
     long-summary: |
         Usage:          --tables-to-restore tables=table1 [table2 ...]
-  - name: --backup-retention-lock-expiration-timestamp
+  - name: --backup-retention-lock-expiration-timestamp --retention-lock-until
     short-summary: Set the retention lock expiration timestamp for continuous mode backups.
     long-summary: |
       Usage:    --backup-retention-lock-expiration-timestamp 2030-01-01T00:00:00Z
@@ -966,7 +966,7 @@ parameters:
         Default:        single region account in the location of the specified resource group.
         Failover priority values are 0 for write regions and greater than 0 for read regions. A failover priority value must be unique and less than the total number of regions.
         Multiple locations can be specified by using more than one `--locations` argument.
-  - name: --backup-retention-lock-expiration-timestamp
+  - name: --backup-retention-lock-expiration-timestamp --retention-lock-until
     short-summary: Push forward the retention lock expiration timestamp for continuous mode backups.
     long-summary: |
       Usage:    --backup-retention-lock-expiration-timestamp 2030-06-01T00:00:00Z
