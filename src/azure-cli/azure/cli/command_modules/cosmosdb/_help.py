@@ -193,7 +193,7 @@ parameters:
       Usage:    --enable-burst-capacity true
       Default:  false
       The accepted values for the enable-burst-capacity are true and false.
-  - name: --enable-per-partition-automatic-failover
+  - name: --enable-per-partition-automatic-failover --enable-ppaf
     short-summary: Enable per-partition automatic failover for the account.
     long-summary: |
       Usage:    --enable-per-partition-automatic-failover true
@@ -979,7 +979,7 @@ parameters:
       Usage:    --enable-burst-capacity true
       Default:  false
       The accepted values for the enable-burst-capacity are true and false.
-  - name: --enable-per-partition-automatic-failover
+  - name: --enable-per-partition-automatic-failover --enable-ppaf
     short-summary: Enable per-partition automatic failover for the account.
     long-summary: |
       Usage:    --enable-per-partition-automatic-failover true
